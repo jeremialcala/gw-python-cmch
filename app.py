@@ -13,7 +13,7 @@ from inspect import currentframe
 from classes import Settings
 
 app = FastAPI(
-    title="Sistema de Control de Beneficios",
+    title="Sistema de Control de Beneficios (SCB)",
     version="1.0"
 )
 _set = Settings()
