@@ -22,15 +22,23 @@ _set = Settings()
 def mensaje():
     return 'Hola'
 
-@app.post('/personas')
+
+@app.post('/personas', tags=['personas'])
 async def registrar_persona(request:Request):
+    """
+    
+    """
     data=await request.json()
     return Response(status_code=200)
 
-@app.put('/personas/{id_persona}')
+@app.get('/personas/{id_persona}', tags=['personas'])
+
+@app.put('/personas/{id_persona}', tags=['personas'])
 async def update_persona(request:Request):
     return Response(status_code=200)
 
-@app.delete('/personas/{id_persona}')
+@app.delete('/personas/{id_persona}', tags=['personas'])
 async def delete_persona(request:Request):
     return Response(status_code=200)
+
+
