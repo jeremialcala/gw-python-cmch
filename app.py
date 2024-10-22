@@ -73,8 +73,9 @@ async def eliminar_persona(id_persona: int):
 
 @app.post('/nomina', tags=['nominas'])
 async def registrar_nomina(nomina: Nomina):
-    return Response(status_code=200)
-    pass
+    data = jsonable_encoder(nomina)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 @app.get('/nominas/{codnom}', tags=['nominas'])
 async def consultar_nomina(codnom: int):

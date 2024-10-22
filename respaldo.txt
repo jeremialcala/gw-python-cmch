@@ -1,0 +1,57 @@
+import json
+import logging.config
+import asyncio
+from fastapi import FastAPI, Request, Response
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel, Field
+from datetime import date
+from classes import Persona, Nomina, Unidad, Beneficio, Producto, Usuario
+import aio_pika
+
+app = FastAPI(
+    title="Sistema de Control de Beneficios (SCB)",
+    version="1.0"
+)
+
+# Function to send message to RabbitMQ
+async def send_message(message: dict):
+    connection = await aio_pika.connect_robust("amqp://guest:guest@127.0.0.1:5672/")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue("test_queue", durable=True)
+        await channel.default_exchange.publish(
+            aio_pika.Message(body=json.dumps(message).encode()),
+            routing_key=queue.name
+        )
+
+# Function to receive messages from RabbitMQ
+async def receive_messages():
+    connection = await aio_pika.connect_robust("amqp://guest:guest@127.0.0.1:5672/")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue("test_queue", durable=True)
+        async with queue.iterator() as queue_iter:
+            async for message in queue_iter:
+                async with message.process():
+                    print(f"Received message: {message.body.decode()}")
+
+@app.on_event("startup")
+async def startup_event():
+    loop = asyncio.get_event_loop()
+    loop.create_task(receive_messages())
+
+@app.post('/personas', tags=['personas'])
+async def registrar_persona(persona: Persona):
+    data = jsonable_encoder(persona)
+    await send_message(data)  # Send data to RabbitMQ
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
+# Resto de tus endpoints...
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# En archivo dto.py
+from pydantic import BaseModel, Field
+from datetime import date
