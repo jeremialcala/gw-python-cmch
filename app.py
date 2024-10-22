@@ -59,10 +59,12 @@ async def consultar_persona(cedula:int):
     return Response(status_code=200)
     pass
 
+
 @app.put('/personas/{id_persona}', tags=['personas'])
-async def actualizar_persona(id_persona: int):
-    return Response(status_code=200)
-    pass
+async def actualizar_persona(id_persona: int, persona: Persona):
+    data = jsonable_encoder(persona)
+    await send_message(data)  # Send data to RabbitMQ
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 @app.delete('/personas/{id_persona}', tags=['personas'])
 async def eliminar_persona(id_persona: int):
@@ -82,8 +84,11 @@ async def consultar_nomina(codnom: int):
     return Response(status_code=200)
 
 @app.put('/nominas/{codnom}', tags=['nominas'])
-async def actualizar_nomina(codnom: int):
-    return Response(status_code=200)
+async def actualizar_nomina(codnom: int, nomina: Nomina):
+    data = jsonable_encoder(nomina)
+    await send_message(data)  # Send data to RabbitMQ
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.delete('/nominas/{codnom}', tags=['nominas'])
 async def eliminar_nomina(codnom:int):
@@ -91,18 +96,23 @@ async def eliminar_nomina(codnom:int):
 
 
 
-
 @app.post('/unidades', tags=['unidades'])
 async def registrar_unidad(unidad: Unidad):
-    return Response(status_code=200)
+    data = jsonable_encoder(unidad)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.get('/unidades/{id_und}', tags=['unidades'])
 async def consultar_unidad(id_und: int):
     pass
 
 @app.put('/unidades/{id_und}', tags=['unidades'])
-async def actualizar_unidad(id_und: int):
-    pass
+async def actualizar_unidad(id_und: int, unidad:Nomina):
+    data = jsonable_encoder(unidad)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.delete('/unidades/{id_und}', tags=['unidades'])
 async def eliminar_unidad(id_und: int):
@@ -112,15 +122,21 @@ async def eliminar_unidad(id_und: int):
 
 @app.post('/productos', tags=['productos'])
 async def registrar_producto(producto: Producto):
-    return Response(status_code=200)
+    data = jsonable_encoder(producto)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.get('/productos/{id_producto}', tags=['productos'])
 async def consultar_producto(id_producto: int):
     return Response(status_code=200)
 
 @app.put('/productos/{id_producto}', tags=['productos'])
-async def actualizar_unidad(id_producto: int):
-    return Response(status_code=200)
+async def actualizar_unidad(id_producto: int, producto: Producto):
+    data = jsonable_encoder(producto)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.delete('/productos/{id_producto}', tags=['productos'])
 async def eliminar_producto(id_producto: int):
@@ -131,15 +147,20 @@ async def eliminar_producto(id_producto: int):
 
 @app.post('/beneficios', tags=['beneficios'])
 async def registrar_beneficio(benefico: Beneficio):
-    return Response(status_code=200)
+    data = jsonable_encoder(benefico)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 @app.get('/beneficios/{id_beneficio}', tags=['beneficios'])
 async def consultar_beneficio(id_beneficio: int):
     return Response(status_code=200)
 
 @app.put('/beneficios/{id_beneficio}', tags=['beneficios'])
-async def actualizar_benefcio(id_beneficio: int):
-    return Response(status_code=200)
+async def actualizar_benefcio(id_beneficio: int, beneficio: Beneficio):
+    data = jsonable_encoder(beneficio)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.delete('/beneficios/{id_beneficio}', tags=['beneficios'])
 async def eliminar_beneficio(id_beneficio: int):
@@ -151,7 +172,10 @@ async def eliminar_beneficio(id_beneficio: int):
 
 @app.post('/seguridad', tags=['seguridad'])
 async def registrar_usuaro(usuario: Usuario):
-    return Response(status_code=200)
+    data = jsonable_encoder(usuario)
+    await send_message(data)
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
+
 
 @app.get('/seguridad/{user}', tags=['seguridad'])
 async def consultar_usuario(user: str):
