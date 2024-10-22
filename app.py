@@ -25,9 +25,9 @@ app = FastAPI(
 
 # Function to send message to RabbitMQ
 async def send_message(message: dict):
-    log.info(f"test: {message}")
+#    log.info(f"test: {message}")
     try:
-        connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
+        connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672/")
         async with connection:
             channel = await connection.channel()
             queue = await channel.declare_queue("ENVIO_DE_MENSAJES", durable=True)
@@ -41,7 +41,7 @@ async def send_message(message: dict):
 
 # Function to receive messages from RabbitMQ
 async def receive_messages():
-    connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
+    connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue("RECEPCION_MENSAJES", durable=True)
@@ -176,7 +176,7 @@ async def eliminar_beneficio(id_beneficio: int):
 @app.post('/seguridad', tags=['seguridad'])
 async def registrar_usuaro(usuario: Usuario):
     data = jsonable_encoder(usuario)
-    await send_message(data)
+    await send_message(data)  
     return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 

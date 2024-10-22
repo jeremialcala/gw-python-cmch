@@ -33,8 +33,8 @@ class Beneficio(BaseModel):
     estatus: int = Field(min_length=1)
 
 class Usuario(BaseModel):
-    id_usuario: int = Field(min_length=1)
+    id_usuario: int = Field(gt=0)
     username: str = Field(min_length= 5, max_length=10)
     password: str = Field(min_length= 5, max_length=10)
     fecha_registro: date
-    estatus: int = Field(min_length=1)
+    estatus: int = Field(gt=0)
