@@ -168,8 +168,6 @@ async def eliminar_beneficio(id_beneficio: int):
 
 
 
-
-
 @app.post('/seguridad', tags=['seguridad'])
 async def registrar_usuaro(usuario: Usuario):
     data = jsonable_encoder(usuario)
