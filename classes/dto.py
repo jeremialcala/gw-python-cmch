@@ -1,14 +1,13 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import date
 
 class Persona(BaseModel):
-    id_persona: int = Field(min_length=1)
-    cedula: int = Field(min_length=6,max_length=8)
+    id_persona: int = Field(gt=0)
+    cedula: int = Field(gt=99999, lt=100000000)
     nombre: str = Field(min_length=7, max_length=15)
     apellido: str = Field(min_length=7, max_length=40)
-    estatus: int = Field(min_length=1)
-    fecha_nac : date
+    estatus: int = Field(gt=0)
+    fecha_nac: date
     fecha_ingreso: date
 
 class Nomina(BaseModel):

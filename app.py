@@ -9,28 +9,50 @@ from fastapi import FastAPI, Request, Response
 from fastapi import status
 from inspect import currentframe
 from fastapi.encoders import jsonable_encoder
+from classes import Persona, Nomina, Unidad, Beneficio, Producto, Usuario
 
-from dto import Persona
-from dto import Nomina
-from dto import Unidad
-from dto import Beneficio
-
-from dto import Producto
-from dto import Usuario
-from classes import Settings
+#from classes import Settings
+import aio_pika
 
 app = FastAPI(
     title="Sistema de Control de Beneficios (SCB)",
     version="1.0"
 )
-_set = Settings()
 
+#_set = Settings()
+
+# Function to send message to RabbitMQ
+async def send_message(message: dict):
+    connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue("ENVIO_DE_MENSAJES", durable=True)
+        await channel.default_exchange.publish(
+            aio_pika.Message(body=json.dumps(message).encode()),
+            routing_key=queue.name
+        )
+
+# Function to receive messages from RabbitMQ
+async def receive_messages():
+    connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue("RECEPCION_MENSAJES", durable=True)
+        async with queue.iterator() as queue_iter:
+            async for message in queue_iter:
+                async with message.process():
+                    print(f"Received message: {message.body.decode()}")
+
+@app.on_event("startup")
+async def startup_event():
+    loop = asyncio.get_event_loop()
+    loop.create_task(receive_messages())
 
 @app.post('/personas', tags=['personas'])
 async def registrar_persona(persona: Persona):
-    data = persona
-    Persona.append(jsonable_encoder(data))
-    return Persona
+    data = jsonable_encoder(persona)
+    await send_message(data)  # Send data to RabbitMQ
+    return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 @app.get('/personas/{cedula}', tags=['personas'])
 async def consultar_persona(cedula:int):
@@ -144,11 +166,3 @@ async def eliminar_usuario(id_usuario: int):
 
 
 
-
-@app.post('/personas', tags=['otros'])
-async def registrar_persona(request:Request):
-    """
-    
-    """
-    data=await request.json()
-    return Response(status_code=200)
