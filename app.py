@@ -13,6 +13,8 @@ from classes import Persona, Nomina, Unidad, Beneficio, Producto, Usuario
 
 #from classes import Settings
 import aio_pika
+import logging
+log=logging.getLogger()
 
 app = FastAPI(
     title="Sistema de Control de Beneficios (SCB)",
@@ -23,14 +25,19 @@ app = FastAPI(
 
 # Function to send message to RabbitMQ
 async def send_message(message: dict):
-    connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
-    async with connection:
-        channel = await connection.channel()
-        queue = await channel.declare_queue("ENVIO_DE_MENSAJES", durable=True)
-        await channel.default_exchange.publish(
-            aio_pika.Message(body=json.dumps(message).encode()),
-            routing_key=queue.name
-        )
+    log.info(f"test: {message}")
+    try:
+        connection = await aio_pika.connect_robust("amqp://soportecmch:s0p0rt3cmch@172.16.10.147:30672")
+        async with connection:
+            channel = await connection.channel()
+            queue = await channel.declare_queue("ENVIO_DE_MENSAJES", durable=True)
+            await channel.default_exchange.publish(
+                aio_pika.Message(body=json.dumps(message).encode()),
+                routing_key=queue.name
+            )
+            log.info("Message sent to RabbitMQ")
+    except Exception as e:
+        log.error(f"Failed to send message: {e}")
 
 # Function to receive messages from RabbitMQ
 async def receive_messages():
@@ -51,7 +58,7 @@ async def startup_event():
 @app.post('/personas', tags=['personas'])
 async def registrar_persona(persona: Persona):
     data = jsonable_encoder(persona)
-    await send_message(data)  # Send data to RabbitMQ
+    await send_message(data)  
     return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 @app.get('/personas/{cedula}', tags=['personas'])
@@ -86,15 +93,13 @@ async def consultar_nomina(codnom: int):
 @app.put('/nominas/{codnom}', tags=['nominas'])
 async def actualizar_nomina(codnom: int, nomina: Nomina):
     data = jsonable_encoder(nomina)
-    await send_message(data)  # Send data to RabbitMQ
+    await send_message(data)  
     return Response(status_code=200, content=json.dumps(data), headers={"Content-Type": "application/json"})
 
 
 @app.delete('/nominas/{codnom}', tags=['nominas'])
 async def eliminar_nomina(codnom:int):
     return Response(status_code=200)
-
-
 
 @app.post('/unidades', tags=['unidades'])
 async def registrar_unidad(unidad: Unidad):
