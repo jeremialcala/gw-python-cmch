@@ -9,12 +9,11 @@ import functools
 from inspect import currentframe
 import pika
 from pika.channel import Channel
-import aio_pika
 
 from classes import Settings
 from utils import configure_logging
 from constants import STARTING_AT, ENDING_AT
-from .service import service_lifecycle
+
 
 
 _set = Settings()

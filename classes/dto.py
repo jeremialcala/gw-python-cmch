@@ -1,5 +1,9 @@
 from pydantic import BaseModel, Field
 from datetime import date
+from uuid import uuid4
+
+from enums import Operations
+
 
 class Persona(BaseModel):
     id_persona: int = Field(gt=0)
@@ -38,3 +42,11 @@ class Usuario(BaseModel):
     password: str = Field(min_length= 5, max_length=10)
     fecha_registro: date
     estatus: int = Field(gt=0)
+
+class Mensage(BaseModel):
+    message_id: str = Field(default=str(uuid4()))
+    resource: str = Field(default="persona")
+    origen: str = Field(default="gateway")
+    destination: str = Field(default="personas")
+    operation: str = Field(default=Operations.POST)
+    body: str = Field(default="")
