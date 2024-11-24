@@ -15,19 +15,18 @@ from utils import configure_logging
 from constants import STARTING_AT, ENDING_AT
 
 
-
 _set = Settings()
 log = logging.getLogger(__name__)
 logging.config.dictConfig(configure_logging())
 
 
-def get_amqp_connection_parameters(host=_set.qms_server, port=_set.qms_port):
+def get_amqp_connection_parameters(host=_set.amqp_host, port=_set.amqp_port):
     """
     :return: pika Connection parameters for RabbitMQ.
     """
     log.info(STARTING_AT, currentframe().f_code.co_name)
-    credentials = pika.credentials.PlainCredentials(username=_set.qms_user,
-                                                    password=_set.qms_password)
+    credentials = pika.credentials.PlainCredentials(username=_set.amqp_user,
+                                                    password=_set.amqp_password)
 
     conn_parameters = pika.ConnectionParameters(host=host, port=port,
                                                 credentials=credentials)
