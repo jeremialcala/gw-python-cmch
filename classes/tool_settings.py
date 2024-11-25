@@ -30,4 +30,8 @@ class Settings(BaseSettings):
     private_key_filename: str
     public_key_filename: str
 
+    message: str
+    person_dto: str
+    session_dto: str 
+    
     model_config = SettingsConfigDict(env_file=".env")
