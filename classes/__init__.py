@@ -10,3 +10,4 @@ from .tool_settings import Settings
 
 # DTOs
 from .dto import Persona, Nomina, Unidad, Beneficio, Producto, Usuario
+from .response_dto import ResponseData
